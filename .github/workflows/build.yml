@@ -1,0 +1,29 @@
+name: Build jar
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 25
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: 9.6.0
+      - name: Unpack and build
+        run: |
+          unzip -q -o fastclient.zip -d _proj
+          cd _proj/fastclient
+          gradle build --no-daemon
+      - uses: actions/upload-artifact@v4
+        with:
+          name: fastclient-jar
+          path: |
+            _proj/fastclient/build/libs/*.jar
+            !_proj/fastclient/build/libs/*-sources.jar
